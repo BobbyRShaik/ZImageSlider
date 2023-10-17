@@ -1,1 +1,5 @@
 leafmap
+requests
+PIL
+os
+tkinter
