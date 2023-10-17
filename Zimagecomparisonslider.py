@@ -3,15 +3,15 @@
 
 # In[ ]:
 
-
+import streamlit as st
+import streamlit.components.v1 as components
 import leafmap
 import requests
 from PIL import Image
 import os
 from tkinter import filedialog
 from tkinter import Tk
-import streamlit as st
-import streamlit.components.v1 as components
+
 
 def is_valid_image_url(url):
     try:
