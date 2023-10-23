@@ -1,79 +1,63 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-import leafmap
-import requests
-from PIL import Image
-import os
-from tkinter import filedialog
-from tkinter import Tk
 import streamlit as st
 import streamlit.components.v1 as components
+import pandas as pd
+from io import StringIO
+import leafmap
 
-
-def is_valid_image_url(url):
-    try:
-        response = requests.head(url)
-        if response.status_code == 200:
-            # Check if the URL points to a valid image
-            image = Image.open(requests.get(url, stream=True).raw)
-            return True
+def ImageCompare():
+    if k==1:
+        print(k)
+        if img1 and img2:
+            leafmap.image_comparison(
+                img1,
+                img2,
+                label1='Image 1',
+                label2='Image 2',
+                starting_position=50,
+                out_html='image_comparison.html'
+            )
+            HtmlFile = open("image_comparison.html", 'r', encoding='utf-8')
+            source_code = HtmlFile.read() 
+            components.html(source_code,width=600,height=600)
         else:
-            return False
-    except Exception as e:
-        return False
-
-def get_local_image_path():
-    root = Tk()
-    root.withdraw()  # Hide the main window
-    file_path = filedialog.askopenfilename(title="Select an image file", filetypes=(("Image files", "*.jpg *.jpeg *.png *.bmp *.gif"), ("All files", "*.*")))
-    return file_path
-
-def get_image_choice():
-    while True:
-        try:
-            choice = input("Do you want to import an image via URL or from your local machine? (URL/local): ").lower()
-            if choice == 'url':
-                url = input('Enter the URL for the image: ')
-                if is_valid_image_url(url):
-                    return url
-                else:
-                    print("Invalid image URL. Please enter a valid image URL.")
-            elif choice == 'local':
-                file_path = get_local_image_path()
-                if file_path:
-                    return file_path  # Return the local file path
-                else:
-                    print("Invalid local image file path. Please select a valid file.")
-            else:
-                print("Invalid choice. Please enter 'URL' or 'local'.")
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-
-img1 = get_image_choice()
-img2 = get_image_choice()
-
-if img1 and img2:
-    leafmap.image_comparison(
-        img1,
-        img2,
-        label1='Image 1',
-        label2='Image 2',
-        starting_position=50,
-        out_html='image_comparison.html'
-    )
-    HtmlFile = open("image_comparison.html", 'r', encoding='utf-8')
-    source_code = HtmlFile.read() 
-    components.html(source_code,width=600,height=600)
-else:
-    print("Invalid or no image files selected.")
+            print("Invalid or no image files selected.")
 
 
-# In[ ]:
+uploaded_files = st.file_uploader("Choose a file",accept_multiple_files=True)
+i=0
+k=0
+for uploaded_file in uploaded_files: 
+    k=1  
+    if i==0:
+        img1=uploaded_file.name
+        i=i+1
+        with open(uploaded_file.name,'wb') as f:
+            f.write(uploaded_file.getbuffer())
+    else:
+        img2=uploaded_file.name
+        with open(uploaded_file.name,'wb') as f:
+            f.write(uploaded_file.getbuffer())
+        ImageCompare()
 
 
 
+
+#if uploaded_file is not None:
+ #   f1=uploaded_file.name
+    # To read file as bytes:
+    
+  #  bytes_data = uploaded_file.getvalue()
+   # st.write(bytes_data)
+
+    # To convert to a string based IO:
+  #  stringio = StringIO(uploaded_file.getvalue().decode("utf-8"))
+   # st.write(stringio)
+
+    # To read file as string:
+  #  string_data = stringio.read()
+   # st.write(string_data)
+
+    # Can be used wherever a "file-like" object is accepted:
+   # dataframe = pd.read_csv(uploaded_file)
+   # st.write(dataframe)
 
